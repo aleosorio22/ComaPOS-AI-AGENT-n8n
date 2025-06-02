@@ -1,0 +1,367 @@
+{
+  "name": "mcp server reports",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "0c1608fa-dd60-4ae5-8387-413dada9e33a"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 1,
+      "position": [
+        52,
+        60
+      ],
+      "id": "c7ce094d-1112-43fd-bf60-54a25652c6f4",
+      "name": "MCP Server Trigger",
+      "webhookId": "0c1608fa-dd60-4ae5-8387-413dada9e33a"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://3.208.171.1/api/auth/login",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"correo\": \"admin@comapos.com\",\n  \"contraseña\": \"admin123\"\n}\n",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        -100,
+        280
+      ],
+      "id": "15501bd1-4706-4d49-9817-b38d8acb3b58",
+      "name": "Login"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Este endpoint hace la consulta a un backend de las ventas de un día en especifico, requiere un token de autenticacion que lo podemos recibir de la tool \"Login\" \n\nLa fecha debe ir en formato YYYY-MM-DD",
+        "url": "=https://3.208.171.1/api/reportes/caja/ventas-dia",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fecha",
+              "value": "={{ $fromAI('fecha', 'en formato YYYY-MM-DD') }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', `Aca se debe colocar el token generado por la herramienta colocada por la tool de Login. Ejemplo: Bearer x9ukjen9q09303....`, 'string') }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        20,
+        280
+      ],
+      "id": "b7da586f-2d54-45f5-9a6b-3f59c9da0637",
+      "name": "Ventas del dia"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Este endpoint hace la consulta al backend sobre las ventas en un periodo seleccionado. Primero se debe ejecutar la herramienta Login para obtener el token de autenticacion  y pasarlo en el header",
+        "url": "=https://3.208.171.1/api/reportes/ventas-periodo",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fechaInicio",
+              "value": "={{$fromAI('fechaInicio', 'Este parametro representa la fecha de inicio del periodo a seleccionar del reporte, debe ir en formato YYYY-MM--DD ')}}"
+            },
+            {
+              "name": "fechaFin",
+              "value": "={{$fromAI('fechaFin', 'Este parametro representa la fecha de fin  del periodo a seleccionar del reporte, debe ir en formato YYYY-MM--DD ')}}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', `Aca se debe colocar el token generado por la herramienta colocada por la tool de Login. Ejemplo: Bearer x9ukjen9q09303....`, 'string') }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        140,
+        280
+      ],
+      "id": "721505a3-944a-428b-9b85-74acbb31573e",
+      "name": "Ventas por periodo"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Este endpoint hace la consulta al backend sobre el reporte completo de un dia en especifico, y si no se envia una fecha, se selecciona la fecha actual, se debe ejecutar antes el nodo Login para obtener el JWT y tenerlo como parametro en el header.",
+        "url": "=https://3.208.171.1/api/reportes/caja/reporte-completo",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fecha",
+              "value": "={{$fromAI('fecha', 'Este parametro representa la fecha del reporte completo del dia, si no se pasa una fecha se debe seleccionar la fecha actual.  Debe ir en formato YYYY-MM--DD ')}}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', `Aca se debe colocar el token generado por la herramienta colocada por la tool de Login. Ejemplo: Bearer x9ukjen9q09303....`, 'string') }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        280
+      ],
+      "id": "c66cb9ea-5de1-4ac6-8828-9a015165ef15",
+      "name": "Reporte Completo"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Antes de ejecutar este nodo, ejecuta Login para tener el JWT. Este endpoint hace la consulta al backend sobre los productos mas vendidos en un periodo seleccionado.",
+        "url": "=https://3.208.171.1/api/reportes/productos-mas-vendidos",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fechaInicio",
+              "value": "={{$fromAI('fechaInicio', 'Este parametro representa la fecha de inicio del periodo a seleccionar del reporte, debe ir en formato YYYY-MM--DD ')}}"
+            },
+            {
+              "name": "fechaFin",
+              "value": "={{$fromAI('fechaFin', 'Este parametro representa la fecha de fin  del periodo a seleccionar del reporte, debe ir en formato YYYY-MM--DD ')}}"
+            },
+            {
+              "name": "limit",
+              "value": "10"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', `Aca se debe colocar el token generado por la herramienta colocada por la tool de Login. Ejemplo: Bearer x9ukjen9q09303....`, 'string') }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        460,
+        260
+      ],
+      "id": "7ed2efe1-9a37-4597-9099-2d0006f80574",
+      "name": "Prod mas vendidos"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Este endpoint hace la consulta al backend sobre los productos bajos de stock.",
+        "url": "=https://3.208.171.1/api/reportes/productos-bajo-stock",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', `Aca se debe colocar el token generado por la herramienta colocada por la tool de Login. Ejemplo: Bearer x9ukjen9q09303....`, 'string') }}"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        240
+      ],
+      "id": "250f1f0e-b93e-4864-b117-eff356ccb775",
+      "name": "Bajos stock"
+    },
+    {
+      "parameters": {
+        "description": "Este flujo se encarga de enviar un correo cuando hay productos con bajo stock.\n",
+        "workflowId": {
+          "__rl": true,
+          "value": "QMICcLBlf5pUru36",
+          "mode": "list",
+          "cachedResultName": "mcp Mail"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "correo": "comatecgt@gmail.com",
+            "asunto": "🚨 Productos con bajo stock",
+            "productos": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('productos', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "asunto",
+              "displayName": "asunto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "productos",
+              "displayName": "productos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "correo",
+              "displayName": "correo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        780,
+        260
+      ],
+      "id": "755bcb73-0c81-465c-b1ea-4c4dbcfb357c",
+      "name": "Call n8n Workflow Tool"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Login": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ventas del dia": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ventas por periodo": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reporte Completo": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prod mas vendidos": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bajos stock": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call n8n Workflow Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "67f1160e-5e23-4a09-9392-86f51a5392be",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "40a5ea68f4969863021162f7772891c2e5347c7af6af7702785ba6607f930ad0"
+  },
+  "id": "3hUIhUEVBs679MWv",
+  "tags": []
+}
