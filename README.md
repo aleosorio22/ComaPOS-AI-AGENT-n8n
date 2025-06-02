@@ -82,7 +82,9 @@ Desarrollador del sistema ComaPOS y de la arquitectura de automatización.
 🌐 GitHub: [@aleosorio22](https://github.com/aleosorio22)
 
 **Karen Jiménez**  
-Colaboradora en la creación de los flujos automatizados de n8n.  
+Colaboradora en la creación de los flujos automatizados de n8n.
+Integracion del backend con n8n.
+Testing de los flujos.
 📧 Email: [kjimenezg6@miumg.edu.gt](mailto:kjimenezg6@miumg.edu.gt)
 
 ---
